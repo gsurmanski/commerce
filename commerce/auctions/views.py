@@ -17,7 +17,7 @@ def index(request):
 def listing(request, id):
     listings = Listing.objects.filter(id=id)
 
-    return render(request, "auctions/index.html",{
+    return render(request, "auctions/listing.html",{
                   "listings": listings
                   })
 

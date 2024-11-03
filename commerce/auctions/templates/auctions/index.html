@@ -3,27 +3,25 @@
 {% block body %}
     <h3>Active Listings</h3>
 
-    <ul>
-        {% for listing in listings %}
-        <li>
-            <div>
-                id: {{ listing.id }}
+    <div class="container my-4">
+        <div class="row">
+            {% for listing in listings %}
+            <div class="col-md-4 mb-4"> <!-- Adjust column size as needed -->
+                <div class="card h-100">
+                    {% if listing.image_url != "" %}
+                    <img src="{{ listing.image_url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'listing' listing.id %}" class="text-decoration-none">{{ listing.title }}</a>
+                        </h5>
+                        <p class="card-text">{{ listing.description }}</p>
+                        <p class="card-text"><strong>Price:</strong> ${{ listing.current_price }} USD</p>
+                    </div>
+                </div>
             </div>
-            <div>
-            <a href= "{% url 'listing' listing.id %}">{{ listing.title }}</a>
-            </div>
-            <div>
-                {{ listing.description }}
-            </div>
-            <div>
-                price: <b>${{ listing.current_price }} USD</b>
-            </div>
-            {% if listing.image_url != "" %}
-            <div>
-              <img src="{{ listing.image_url }}">
-            </div>
-            {% endif %}
-        </li>
-        {% endfor %}
-    </ul>
+            {% endfor %}
+        </div>
+    </div>
+    
 {% endblock %}
