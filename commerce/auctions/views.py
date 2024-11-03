@@ -15,10 +15,10 @@ def index(request):
                   })
 
 def listing(request, id):
-    listings = Listing.objects.filter(id=id)
+    listing = Listing.objects.get(id=id)
 
     return render(request, "auctions/listing.html",{
-                  "listings": listings
+                  "listing": listing
                   })
 
 def login_view(request):

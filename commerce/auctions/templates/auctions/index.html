@@ -9,11 +9,11 @@
             <div class="col-md-4 mb-4"> <!-- Adjust column size as needed -->
                 <div class="card h-100">
                     {% if listing.image_url != "" %}
-                    <img src="{{ listing.image_url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                    <a href="{% url 'listing' listing.id %}" class="text-decoration-none"><img src="{{ listing.image_url }}" class="card-img-top" style="height: 200px; object-fit: cover;"></a>
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">
-                            <a href="{% url 'listing' listing.id %}" class="text-decoration-none">{{ listing.title }}</a>
+                            <a href="{% url 'listing' listing.id %}">{{ listing.title }}</a>
                         </h5>
                         <p class="card-text">{{ listing.description }}</p>
                         <p class="card-text"><strong>Price:</strong> ${{ listing.current_price }} USD</p>
