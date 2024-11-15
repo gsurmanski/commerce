@@ -6,8 +6,8 @@
     <div class="container my-4">
         <div class="row">
             {% for listing in listings %}
-            <div class="col-md-4 mb-4"> <!-- Adjust column size as needed -->
-                <div class="card h-100">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0">
                     {% if listing.image_url != "" %}
                     <a href="{% url 'listing' listing.id %}" class="text-decoration-none"><img src="{{ listing.image_url }}" class="card-img-top" style="height: 200px; object-fit: cover;"></a>
                     {% endif %}
@@ -16,7 +16,7 @@
                             <a href="{% url 'listing' listing.id %}">{{ listing.title }}</a>
                         </h5>
                         <p class="card-text">{{ listing.description }}</p>
-                        <p class="card-text"><strong>Price:</strong> ${{ listing.current_price }} USD</p>
+                        <p class="card-text"><b>Price:</b> ${{ listing.current_price }} USD</p>
                     </div>
                 </div>
             </div>

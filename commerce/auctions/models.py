@@ -29,13 +29,25 @@ class Listing(models.Model):
         return self.title
 
 class Bid(models.Model):
-    amount = models.IntegerField(validators=[MinValueValidator(0.01)])
-
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+        )
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user} - {self.bid}'
 
 class Comment(models.Model):
     text = models.TextField(max_length=500, default="")
 
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class Watchlist(models.Model):
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user} - {self.listing}'
