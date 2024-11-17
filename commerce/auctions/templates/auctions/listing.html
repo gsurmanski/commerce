@@ -54,23 +54,47 @@
             </div>
         </div>
 
-        {% if user.is_authenticated and closed == False %}
         <p></p>
-        <form method="POST" action="{% url 'listing' listing.id %}">
-            {% csrf_token %}
-            <div class="form-group">
-                <textarea class ="form-control" name="comment" rows="4" cols="50"></textarea>
+
+        <!--comment widget-->
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-12 col-lg-12">
+              <div class="card shadow-0 border" style="background-color: #f0f2f5;">
+                <div class="card-body p-4">
+                  <div data-mdb-input-init class="form-outline mb-4">
+                    {% if user.is_authenticated and closed == False %}
+                        <form method="POST" action="{% url 'listing' listing.id %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <input type="text" id="addANote" name="comment" class="form-control" placeholder="Type comment..." />
+                                <input type="hidden" name="action" value="comment">
+                            </div>
+                            <label class="form-label" for="addANote">+ Add a note (press Enter)</label>
+                        </form>
+                    {% endif %}
+                  </div>
+                  
+                {% if comments %}
+                    {% for comment in comments %}
+                        <div class="card mb-4">
+                            <div class="card-body">
+                            <p>{{ comment.text }}</p>
+                
+                            <div class="d-flex justify-content-between">
+                                <div class="d-flex flex-row align-items-center">
+                                <p class="small mb-0 ms-2">{{ comment.user }}</p>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                        no comments
+                {% endif %}
+                </div>
+              </div>
             </div>
-            <button class="btn btn-primary" name="action" value="comment">Post Comment</button>
-        </form>
-        {% endif %}
+          </div>
 
-        {% if comment %}
-            {% for comment in comments %}
-
-            {% endfor %}
-        {% else %}
-            no comments
-        {% endif %}
     </div>
 {% endblock %}

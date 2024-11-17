@@ -2,15 +2,17 @@
 
 {% block body %}
 
-{% if errors %}
-    <ul class = "alert alert-danger">
-
-        {% for key, field in errors.items %}
-            <li> {{ key }} : {{ field }}</li>
-
-        {% endfor %}
-    </ul>
-{% endif %}
+    {% if messages %}
+        <ul style="list-style-type: none; text-decoration:none;">
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <li class="alert alert-success">{{ message }}</li>
+                {% elif message.tags == 'error' %}
+                    <li class="alert alert-danger">{{ message }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
 
 <h1>Create a Listing</h1>
 <form action="{% url 'create_listing' %}" method="post">
@@ -20,6 +22,9 @@
         </div>
         <div class="form-group">
             <textarea class ="form-control" name="description" rows="4" cols="50" placeholder="type a description here"></textarea>
+        </div>
+        <div class="form-group">
+            <input class ="form-control" name="category" placeholder="type a category">
         </div>
         <div class="form-group">
             <input class ="form-control" type="text" name="starting_bid" placeholder="starting bid">

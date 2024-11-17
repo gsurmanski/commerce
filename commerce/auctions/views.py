@@ -10,6 +10,8 @@ from decimal import Decimal, InvalidOperation
 #login auth decorator
 from django.contrib.auth.decorators import login_required
 
+from django.shortcuts import get_object_or_404
+
 from .models import *
 
 
@@ -21,15 +23,20 @@ def index(request):
                   })
 
 def listing(request, id):
-    listing = Listing.objects.get(id=id)
+    listing = get_object_or_404(Listing, id=id)
     # Initialize is_in_watchlist to False in case user is not logged in
     is_in_watchlist = False
     # Get the Bid object with the highest bid for the listing. -amount is sort by descending
     highest_bid = Bid.objects.filter(listing=listing).order_by('-amount').first()
+
+    # If no bids exist, create a "default" Bid object
+    if highest_bid is None:
+        # Create a fake Bid object (this will not save to the database, just a temporary placeholder)
+        highest_bid = Bid(amount=listing.current_price, user=listing.user, listing=listing)
+
     #check if listing is closed
-    closed = False
-    if Closed.objects.filter(listing=listing).exists():
-        closed = True
+    closed = Closed.objects.filter(listing=listing).exists()
+
     #get any comments
     comments = Comment.objects.filter(listing=listing)
 
@@ -99,7 +106,10 @@ def listing(request, id):
         elif action == "comment":
             comment = request.POST.get("comment")
             if request.user.is_authenticated and comment != "":
+                Comment(text=comment, listing=listing, user= request.user).save()
                 messages.success(request, "comment added")
+            else:
+                messages.error(request, "type something")
 
          # After handling POST, redirect to avoid resubmission on refresh
         return redirect('listing', id=id)
@@ -172,30 +182,56 @@ def create_listing(request):
         #testing get since POST is a dictionary by default
         start_bid = request.POST.get("starting_bid", "")
         image_url = request.POST["image_url"]
-        #error check
-        errors = {}
+        category = request.POST["category"]
 
-        if title == "":
-            errors["title"]="title cannot be blank"
+        if title.strip() == "":
+           messages.error(request, "title cannot be blank")
+           return redirect('create_listing')
+        elif category.strip() == "":
+           messages.error(request, "category cannot be blank")
+           return redirect('create_listing')
         
-        if start_bid == "":
+        if start_bid.strip() == "":
             start_bid = 0.01
         else:
             try:
-                start_bid = float(start_bid)
+                start_bid = Decimal(start_bid)
             except ValueError:
-                errors["starting_bid"]="an issue with the starting bid format"
-        
-        if errors:
-            return render (request, "auctions/create_listing.html", {
-                    "errors": errors
-                })
-    
+                messages.error(request, "an issue with the starting bid format")
+                return redirect('create_listing')
+            
         #pass user.id from request
-        listing = Listing(user=request.user, title=title, description=description, start_bid=start_bid, current_price=start_bid, image_url=image_url)
+        listing = Listing(user=request.user, title=title, description=description, start_bid=start_bid, current_price=start_bid, image_url=image_url, category=category)
         listing.save()
-        return HttpResponseRedirect(reverse("index"))
+        return redirect('index')
     
     else:
         #return default page if not post form
         return render(request, "auctions/create_listing.html")
+
+def watchlist(request):
+    # Get all listing IDs associated with the user's watchlist
+    listing_ids = Watchlist.objects.filter(user=request.user).values_list('listing', flat=True)
+
+    # Get all Listings that match these IDs
+    listings = Listing.objects.filter(id__in=listing_ids)
+
+    return render(request, "auctions/watchlist.html",{
+                  "listings": listings
+                  })
+
+def categories(request):
+    # Get all listing IDs associated with the user's watchlist
+    categories = Listing.objects.values('category').distinct()
+    
+    return render(request, "auctions/categories.html",{
+                  "categories": categories
+                  })
+
+def category(request, category):
+    # Get all listing IDs associated with the user's watchlist
+    listings = Listing.objects.filter(category=category)
+
+    return render(request, "auctions/category.html",{
+                  "listings": listings
+                  })

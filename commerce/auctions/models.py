@@ -20,6 +20,7 @@ class Listing(models.Model):
         decimal_places=2
         )
     
+    category = models.TextField(max_length=50, default="thing")
     description = models.TextField(max_length=500, default="")
     image_url = models.TextField(max_length=500, default="")
 
